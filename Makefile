@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -std=c99 -O2
 LDFLAGS = -lraylib -lm -lpthread -ldl -lX11
-SRCS = game.c  # Add all your source files here
+SRCS = game.c draw_board.c # Add all your source files here
 #OBJS = $(SRCS:.c=.o)
 EXEC = t  # Change this to your desired output file name
 

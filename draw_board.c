@@ -77,6 +77,7 @@ struct Color getSquareColor(int block){
         color = RED;
         break;
 
+        // block T
         case 7:
         color = PURPLE;
         break;
@@ -89,7 +90,7 @@ struct Color getSquareColor(int block){
     return color;
 }
 
-void drawPosition(int boardPosition[20][10], struct board board){
+void drawPosition(int boardPosition[21][12], struct board board){
     
     struct Square {
         int x;
@@ -100,11 +101,11 @@ void drawPosition(int boardPosition[20][10], struct board board){
     int squareSize = getSquareSize();
 
     for (int i = 19; i >= 0; i--){
-        for ( int j = 0; j < 10; j++){
+        for ( int j = 1; j < 11; j++){
 
             if (boardPosition[i][j] != 0){
-                square.x = board.x + (j * squareSize);
-                square.y = board.y + (i * squareSize);
+                square.x = board.x + ((j-1)* squareSize);
+                square.y = board.y + ((i) * squareSize);
                 struct Color color = getSquareColor(boardPosition[i][j]);
                 DrawRectangleGradientV(square.x, square.y, squareSize,squareSize, color, WHITE);
                 DrawRectangleLines(square.x, square.y, squareSize,squareSize, BLACK);

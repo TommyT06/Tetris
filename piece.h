@@ -4,6 +4,7 @@ struct current_piece {
     int grid[5][5];
     int rotation;
     int placed;
+    int type;
 };
 struct game_stats {
     int piece_count;

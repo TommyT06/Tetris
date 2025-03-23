@@ -9,6 +9,7 @@ struct current_piece {
     int grid[5][5];
     int rotation;
     int placed;
+    int type;
 };
 
 struct game_stats {
@@ -79,25 +80,39 @@ int Z_piece[5][5] = {
     {0, 0, 0, 0, 0}
 };
 
-int gen_offset[4][10] = {
+int gen_shift[4][10] = {
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,1,0,1,-1,0,2,1,2},
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,-1,0,-1,-1,0,2,-1,2},
 };
 
-int i_offset[4][10] = {
+int i_shift[4][10] = {
     {0,0,-1,0,2,0,-1,0,2,0},
-    {-1,0,0,0,0,0,0,1,0,-2},
-    {-1,1,1,1,-2,1,1,0,-1,0},
-    {0,1,0,1,0,1,0,-1,0,2}
+    {1,0,0,0,0,0,0,1,0,-2},
+    {1,-1,1,1,-2,1,1,0,-1,0},
+    {0,-1,0,1,0,1,0,-1,0,2}
 };
 
-int o_offset[4][2] ={
+int o_shift[4][2] ={
+    {0,0},
+    {0,1},
+    {1,1},
+    {1,0}
+};
+
+int i_move[4][2] = {
+    {0,0},
+    {1,0},
+    {1,1},
+    {0,1}
+};
+
+int o_move[4][2] = {
     {0,0},
     {0,-1},
-    {-1,-1},
-    {-1,0}
+    {1,-1},
+    {1,0}
 };
 
 void shuffle(int arr[], int size) {
@@ -122,15 +137,18 @@ void newPiece(struct current_piece* piece, struct game_stats* game){
         piece->y = 0;
         piece->placed = 0;
         piece->rotation = 0;
+        piece->type = 2;
 
         int randomPiece = game->piece_order[game->piece_count];
         game->piece_count++;
         switch (randomPiece){
             case 0:
             copyMatrix(piece->grid, I_piece);
+            piece->type = 0;
             break;
             case 1:
             copyMatrix(piece->grid, O_piece);
+            piece->type = 1;
             break;
             case 2:
             copyMatrix(piece->grid, Z_piece);
@@ -190,7 +208,6 @@ int collisionCheck(struct current_piece piece, int boardPosition[21][12]){
 
 void turnRight(struct current_piece* piece){
 
-
     // Transpose the matrix
     for (int i = 0; i < 5; i++) {
         for (int j = i + 1; j < 5; j++) {
@@ -208,7 +225,29 @@ void turnRight(struct current_piece* piece){
         }
     }
 
+    if (piece->type == 0){
+        piece->x = piece->x - i_move[piece->rotation][0];
+        piece->y = piece->y - i_move[piece->rotation][1];
+    }
+    if (piece->type == 1){
+        piece->x = piece->x - o_move[piece->rotation][0];
+        piece->y = piece->y - o_move[piece->rotation][1];
+    }
+
+
     piece->rotation = (piece->rotation + 1) % 4;
+    printf("%d\n", piece->rotation);
+    fflush(stdout);
+
+    if (piece->type == 0){
+        piece->x = piece->x + i_move[piece->rotation][0];
+        piece->y = piece->y + i_move[piece->rotation][1];
+    }
+    if (piece->type == 1){
+        piece->x = piece->x + o_move[piece->rotation][0];
+        piece->y = piece->y + o_move[piece->rotation][1];
+    }
+
 }
 
 void turnLeft(struct current_piece* piece) {
@@ -231,7 +270,31 @@ void turnLeft(struct current_piece* piece) {
         }
     }
 
-    piece->rotation = (piece->rotation -1) % 4;
+    if (piece->type == 0){
+        piece->x = piece->x - i_move[piece->rotation][0];
+        piece->y = piece->y - i_move[piece->rotation][1];
+    }
+    if (piece->type == 1){
+        piece->x = piece->x - o_move[piece->rotation][0];
+        piece->y = piece->y - o_move[piece->rotation][1];
+    }
+
+
+    piece->rotation = (piece->rotation - 1) % 4;
+    if (piece->rotation == -1){
+        piece->rotation = 3;
+    }
+    printf("%d\n", piece->rotation);
+    fflush(stdout);
+
+    if (piece->type == 0){
+        piece->x = piece->x + i_move[piece->rotation][0];
+        piece->y = piece->y + i_move[piece->rotation][1];
+    }
+    if (piece->type == 1){
+        piece->x = piece->x + o_move[piece->rotation][0];
+        piece->y = piece->y + o_move[piece->rotation][1];
+    }
 }
 
 

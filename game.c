@@ -10,7 +10,6 @@
 #define START_SCREEN_WIDTH 500
 #define START_SCREEN_HEIGHT 500
 
-
 // struct current_piece {
 //     int x;
 //     int y;
@@ -25,6 +24,7 @@ void removePiece(int (*boardPosition)[12], struct current_piece);
 void getInput(struct current_piece*, int boardPosition[21][12]);
 void turnRight(struct current_piece*);
 void turnLeft(struct current_piece*);
+void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece);
 
 
 
@@ -68,9 +68,11 @@ int main(){
     };
     
 
+    struct game_stats game = {0, {0,1,2,3,4,5,6}};
+
     // Game loop
     while (!WindowShouldClose()){
-        newPiece(&piece);
+        newPiece(&piece, &game);
         getInput(&piece, boardPosition);
         addPiece(boardPosition, piece);
         playGame(boardPosition);
@@ -133,12 +135,22 @@ void removePiece(int (*boardPosition)[12], struct current_piece piece){
 
 void getInput(struct current_piece* piece, int boardPosition[21][12]){
 
+    struct current_piece copy;
+
     if (IsKeyPressed(KEY_K)){
-        turnRight(piece);
+        copyPiece(&copy, piece);
+        turnRight(&copy);
+        if (collisionCheck(copy, boardPosition) == 0){
+            turnRight(piece);
+        }
     }
 
     if (IsKeyPressed(KEY_J)){
-        turnLeft(piece);
+        copyPiece(&copy, piece);
+        turnLeft(&copy);
+        if (collisionCheck(copy, boardPosition) == 0){
+            turnLeft(piece);
+        }
     }
 
     if (IsKeyPressed(KEY_SPACE)){
@@ -156,53 +168,5 @@ void getInput(struct current_piece* piece, int boardPosition[21][12]){
     }
 }
 
-
-
-void turnRight(struct current_piece* piece){
-
-    piece->rotation = (piece->rotation + 1) % 4;
-    printf("%d", piece->rotation);
-
-    // Transpose the matrix
-    for (int i = 0; i < 5; i++) {
-        for (int j = i + 1; j < 5; j++) {
-            int temp = piece->grid[i][j];
-            piece->grid[i][j] = piece->grid[j][i];
-            piece->grid[j][i] = temp;
-        }
-    }
-    // Reverse each row
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0, k = 5 - 1; j < k; j++, k--) {
-            int temp = piece->grid[i][j];
-            piece->grid[i][j] = piece->grid[i][k];
-            piece->grid[i][k] = temp;
-        }
-    }
-}
-
-void turnLeft(struct current_piece* piece) {
-
-    piece->rotation = (piece->rotation -1) % 4; 
-    printf("%d", piece->rotation);
-
-    // Transpose the matrix
-    for (int i = 0; i < 5; i++) {
-        for (int j = i + 1; j < 5; j++) {
-            int temp = piece->grid[i][j];
-            piece->grid[i][j] = piece->grid[j][i];
-            piece->grid[j][i] = temp;
-        }
-    }
-
-    // Reverse each column
-    for (int j = 0; j < 5; j++) {
-        for (int i = 0, k = 5 - 1; i < k; i++, k--) {
-            int temp = piece->grid[i][j];
-            piece->grid[i][j] = piece->grid[k][j];
-            piece->grid[k][j] = temp;
-        }
-    }
-}
 
 

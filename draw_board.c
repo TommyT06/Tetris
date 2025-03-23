@@ -1,5 +1,8 @@
 #include "raylib.h"
 #include <math.h>
+#include "piece.h"
+#include "struct.h"
+#include "stdio.h"
 
 struct board {
     int x;
@@ -82,6 +85,10 @@ struct Color getSquareColor(int block){
         color = PURPLE;
         break;
 
+        case 8:
+        color = WHITE;
+        break;
+
         default:
         color = BLACK;
         break;
@@ -90,8 +97,16 @@ struct Color getSquareColor(int block){
     return color;
 }
 
-void drawPosition(int boardPosition[21][12], struct board board){
+void drawPosition(int boardPosition[23][12], struct board board){
     
+    // for (int i =0; i < 21; i++){
+    //     for (int j = 0; j < 12; j++){
+    //         printf("%d ", boardPosition[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+    fflush(stdout);
+
     struct Square {
         int x;
         int y;
@@ -100,16 +115,17 @@ void drawPosition(int boardPosition[21][12], struct board board){
     struct Square square;
     int squareSize = getSquareSize();
 
-    for (int i = 19; i >= 0; i--){
+    for (int i = 21; i >= 2; i--){
         for ( int j = 1; j < 11; j++){
 
             if (boardPosition[i][j] != 0){
                 square.x = board.x + ((j-1)* squareSize);
-                square.y = board.y + ((i) * squareSize);
+                square.y = board.y + ((i-2) * squareSize);
                 struct Color color = getSquareColor(boardPosition[i][j]);
-                DrawRectangleGradientV(square.x, square.y, squareSize,squareSize, color, WHITE);
-                DrawRectangleLines(square.x, square.y, squareSize,squareSize, BLACK);
+                DrawRectangle(square.x, square.y, squareSize,squareSize, color);
             }
         }
     }
 }
+
+

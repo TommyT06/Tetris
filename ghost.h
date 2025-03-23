@@ -1,0 +1,1 @@
+void getGhost(struct current_piece* piece, int boardPosition[23][12]);

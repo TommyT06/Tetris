@@ -2,23 +2,15 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-struct current_piece {
-    int x;
-    int y;
-    int grid[5][5];
-    int rotation;
-    int placed;
-    int type;
-};
+#include "struct.h"
 
 struct game_stats {
     int piece_count;
     int piece_order[7];
 };
 void copyMatrix(int dest[5][5], int src[5][5]);
-int collisionCheck(struct current_piece piece, int boardPosition[21][12]);
-void changeX(struct current_piece* piece, int direction, int boardPosition[21][12]);
+int collisionCheck(struct current_piece* piece, int boardPosition[23][12]);
+void changeX(struct current_piece* piece, int direction, int boardPosition[23][12]);
 void shuffle(int arr[], int size);
 void turnLeft(struct current_piece* piece);
 void turnRight(struct current_piece* piece);
@@ -177,26 +169,26 @@ void copyMatrix(int dest[5][5], int src[5][5]){
     }
 }
 
-void changeX(struct current_piece* piece, int direction, int boardPosition[21][12]){
+void changeX(struct current_piece* piece, int direction, int boardPosition[23][12]){
 
     struct current_piece piece_check;
     piece_check.x = (piece->x) + direction;
     piece_check.y = piece->y;
     copyMatrix(piece_check.grid, piece->grid);
 
-    int collision = collisionCheck(piece_check, boardPosition);
+    int collision = collisionCheck(&piece_check, boardPosition);
 
     if (collision == 0){
         piece->x = piece->x + direction;
     }
 }
 
-int collisionCheck(struct current_piece piece, int boardPosition[21][12]){
+int collisionCheck(struct current_piece* piece, int boardPosition[23][12]){
   
     for (int i = 0; i < 5; i++){
         for (int j = 0; j < 5; j++){
-            if (piece.grid[i][j] != 0){
-                if (boardPosition[piece.y+i][piece.x+j] != 0){
+            if (piece->grid[i][j] != 0){
+                if (boardPosition[piece->y+i][piece->x+j] != 0){
                     return 1;
                 }
             }
@@ -236,8 +228,8 @@ void turnRight(struct current_piece* piece){
 
 
     piece->rotation = (piece->rotation + 1) % 4;
-    printf("%d\n", piece->rotation);
-    fflush(stdout);
+    // printf("%d\n", piece->rotation);
+    // fflush(stdout);
 
     if (piece->type == 0){
         piece->x = piece->x + i_move[piece->rotation][0];
@@ -284,8 +276,8 @@ void turnLeft(struct current_piece* piece) {
     if (piece->rotation == -1){
         piece->rotation = 3;
     }
-    printf("%d\n", piece->rotation);
-    fflush(stdout);
+    // printf("%d\n", piece->rotation);
+    // fflush(stdout);
 
     if (piece->type == 0){
         piece->x = piece->x + i_move[piece->rotation][0];

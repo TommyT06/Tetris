@@ -3,14 +3,12 @@
 #include "struct.h"
 #include <stdio.h>
 
-int lookUp(int boardPosition[23][12], struct current_piece* piece, int y){
+int lookUp(int boardPosition[23][12], struct current_piece* piece, int y, int starter_y){
 
     int temp_y = piece->y;
 
-    while (y > 0){
+    while (y > 0 && y >= starter_y){
         y--;
-        printf("%d ", y);
-        fflush(stdout);
         piece->y = y;
 
         if (collisionCheck(piece, boardPosition) == 1){
@@ -28,21 +26,23 @@ int lookUp(int boardPosition[23][12], struct current_piece* piece, int y){
 
 void getGhost(struct current_piece* piece, int boardPosition[23][12]){
 
-    for (int i = 0; i < 23; i++){
-        for (int j = 0; j < 12; j++){
-            printf("%d ", boardPosition[i][j]);
-        }
-        printf("\n");
-    }
+    // for (int i = 0; i < 23; i++){
+    //     for (int j = 0; j < 12; j++){
+    //         printf("%d ", boardPosition[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
-    fflush(stdout);
+    // fflush(stdout);
 
+
+    int starter_y = piece->y;
 
     piece->y = 10;
 
     for (int i = 19; i >= 0; i--){
         piece->y = i;
-        if ((lookUp(boardPosition, piece, i) == 1) && (collisionCheck(piece, boardPosition) == 0)){
+        if ((lookUp(boardPosition, piece, i, starter_y) == 1) && (collisionCheck(piece, boardPosition) == 0) && (i >= starter_y)){
             break;
         }
     }

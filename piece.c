@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "struct.h"
+#include "raylib.h"
 
 struct game_stats {
     int piece_count;
@@ -108,8 +109,9 @@ int o_move[4][2] = {
 };
 
 void shuffle(int arr[], int size) {
+    SetRandomSeed(GetTime());
     for (int i = size - 1; i > 0; i--) {
-        int j = rand() % (i + 1); // Random index from 0 to i
+        int j = GetRandomValue(0, 6); // Random index from 0 to i
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
@@ -126,7 +128,7 @@ void newPiece(struct current_piece* piece, struct game_stats* game){
 
     if (piece->placed == 1){
         piece->x = 3;
-        piece->y = 0;
+        piece->y = -1;
         piece->placed = 0;
         piece->rotation = 0;
         piece->type = 2;
@@ -180,6 +182,7 @@ void changeX(struct current_piece* piece, int direction, int boardPosition[23][1
 
     if (collision == 0){
         piece->x = piece->x + direction;
+        
     }
 }
 
@@ -296,6 +299,7 @@ void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece
     dest_piece->rotation = src_piece->rotation;
     dest_piece->x = src_piece->x;
     dest_piece->y = src_piece->y;
-    dest_piece->rotation = src_piece->rotation;
+    dest_piece->placed = src_piece->placed;
+    dest_piece->type = src_piece->type;
 
 }

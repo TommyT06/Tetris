@@ -3,13 +3,7 @@
 #include "piece.h"
 #include "struct.h"
 #include "stdio.h"
-
-struct board {
-    int x;
-    int y;
-    int w;
-    int h;
-};
+#include "string.h"
 
 int getSquareSize(void){
 
@@ -126,6 +120,72 @@ void drawPosition(int boardPosition[23][12], struct board board){
             }
         }
     }
+}
+
+void drawScoreboard(struct board board, struct game_stats game){
+
+    int level_x = board.x / 2;
+    int level_y = board.h * 0.5;
+
+    int lines_x = board.x / 2;
+    int lines_y = board.h * 0.7;
+
+    char lines[30] = "Lines Cleared: ";
+    char buf[10];
+
+    snprintf(buf, 10, "%d", game.linesCleared);
+
+    strcat(lines, buf);
+
+    DrawText(lines, lines_x, lines_y, 30, WHITE);
+
+    char level[30] = "Level: ";
+    char buffer[10];
+
+    snprintf(buffer, 10, "%d", game.level);
+
+    strcat(level, buffer);
+
+    DrawText(level, level_x, level_y, 30, WHITE);
+
+}
+
+void drawSmallPiece(struct current_piece piece, struct board board, int x, int y){
+
+    struct square {
+        int x;
+        int y;
+    };
+
+    struct square square;
+
+    int squareSize = (getSquareSize()) * 0.75;
+
+    for (int i = 4; i >= 0; i--){
+        for ( int j = 0; j < 5; j++){
+
+            if (piece.grid[i][j] != 0){
+                square.x = x + ((j)* squareSize);
+                square.y = y + ((i) * squareSize);
+                struct Color color = getSquareColor(piece.grid[i][j]);
+                DrawRectangle(square.x, square.y, squareSize,squareSize, color);
+            }
+        }
+    }
+
+}
+
+void drawPiecesUpNext(struct board board, int x, int y, struct game_stats game){
+
+    struct current_piece piece;
+    piece.placed = 1;
+
+    for (int i = 0; i < 7; i++){
+        newPiece(&piece, &game);
+        piece.placed = 1;
+        drawSmallPiece(piece, board, x, y + ((getSquareSize() * 3)*i));
+    }
+
 }
 
 

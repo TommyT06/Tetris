@@ -10,21 +10,14 @@
 #include "struct.h"
 #include <unistd.h>
 
-#define START_SCREEN_WIDTH 500
-#define START_SCREEN_HEIGHT 500
+#define START_SCREEN_WIDTH 1000
+#define START_SCREEN_HEIGHT 1000
 
-// struct current_piece {
-//     int x;
-//     int y;
-//     int grid[5][5];
-//     int rotation;
-//     int placed;
-// };
-
-void renderScreen(int boardPosition[23][12]);
+void renderScreen(int boardPosition[23][12], struct game_stats, struct current_piece);
+void playGame(void);
 void addPiece(int (*boardPosition)[12], struct current_piece*);
 void removePiece(int (*boardPosition)[12], struct current_piece*);
-int getInput(struct current_piece*, struct current_piece*,  int boardPosition[23][12], struct game_stats*);
+int getInput(struct current_piece*, struct current_piece*,  int boardPosition[23][12], struct game_stats*, struct current_piece*);
 void turnRight(struct current_piece*);
 void turnLeft(struct current_piece*);
 void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece);
@@ -40,110 +33,34 @@ double lastChange = 0;
 int pieceNotMoved = 0;
 double lastTimeMoved = 0;
 
-int main(){
+int usedHoldYetEver = 0;
+int HoldUsedYetThisGo = 0;
 
-    srand(time(NULL));
+int main(){
 
     // start window
     InitWindow(START_SCREEN_WIDTH, START_SCREEN_HEIGHT,"Tetris");
-    SetWindowMinSize(100,100);
-    SetWindowMaxSize(1000,1000);
+    // SetWindowMinSize(100,100);
+    // SetWindowMaxSize(1000,1000);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
+    SetWindowState(FLAG_WINDOW_MAXIMIZED);
     SetTargetFPS(60);
 
-    struct current_piece piece;
-    struct current_piece ghost;
+    int Quit_Game = 0;
 
-    piece.placed = 1;
-
-    
-
-    int boardPosition[23][12] = {
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9},
-    {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
-    };
-    
-
-    struct game_stats game = {0, {0,1,2,3,4,5,6}};
-
-    newPiece(&piece, &game);
+    playGame();
     // Game loop
-    while (!WindowShouldClose()){
-
-        //addPiece(boardPosition, &piece);
-        double currentTime = GetTime();
-        if ((currentTime - lastDropTime >= dropDelay) && piece.y < ghost.y){
-            lastDropTime = currentTime;
-            piece.y++;
+    while (Quit_Game == 0 && !WindowShouldClose()){
+        int playAgain = 0;
+        printf("Play Again: ");
+        scanf("%d", &playAgain);
+        if (playAgain == 0){
+            Quit_Game = 1;
         }
-
-        int changeGhostColourCheck = getInput(&piece, &ghost, boardPosition, &game);
-        
-        ghost = piece;
-
-        copyMatrix(ghost.grid, piece.grid);
-
-        getGhost(&ghost, boardPosition);
-        
-        addPiece(boardPosition, &ghost);
-
-        if (ghost.y == piece.y){
-            if (pieceNotMoved == 0){
-                lastTimeMoved = GetTime();
-                pieceNotMoved = 1;
-            }
-            if (pieceNotMoved == 1){
-                if (currentTime - lastTimeMoved >= 0.5){
-                    changeGhostColourCheck = 1;
-                    pieceNotMoved = 0;
-                }
-            }
+        if (playAgain == 1){
+            while (GetKeyPressed() != 0);
+            playGame();
         }
-
-        if (changeGhostColourCheck == 1){
-            piece.placed = 1;
-            pieceNotMoved = 0;
-            //removePiece(boardPosition, &piece);
-            changeGhost(boardPosition, &piece);
-            newPiece(&piece, &game);
-            if (collisionCheck(&piece, boardPosition)){
-                printf("Game Over");
-                fflush(stdout);
-            }
-            deleteLines(boardPosition);
-            renderScreen(boardPosition);
-        }
-        //getInput(&piece, boardPosition, boardPosition, &game);
-        else{
-            addPiece(boardPosition, &piece);
-            renderScreen(boardPosition);
-            removePiece(boardPosition, &piece);
-            removePiece(boardPosition, &ghost);
-        }
-
-        // check for full lines
-
     }
     CloseWindow();
 
@@ -153,11 +70,22 @@ int main(){
 void playGame(){
 
 
+    heldInputStartTime = 0;
+    lastChange = 0;
+
+    pieceNotMoved = 0;
+    lastTimeMoved = 0;
+
+    usedHoldYetEver = 0;
+    HoldUsedYetThisGo = 0;
+
+
     double lastDropTime = 0;
-    double dropDelay = 0.5;
+    double dropDelay = 1;
     // default stats for game start
     struct current_piece piece;
     struct current_piece ghost;
+    struct current_piece hold;
 
     piece.placed = 1;
 
@@ -188,14 +116,22 @@ void playGame(){
     };
     
 
-    struct game_stats game = {0, {0,1,2,3,4,5,6}};
+    struct game_stats game = {0, {0,1,2,3,4,5,6}, {0,1,2,3,4,5,6}, 0, 1};
+
+    shuffle(game.piece_order, 7);
+    shuffle(game.piece_order2, 7);
 
     newPiece(&piece, &game);
 
-
-
     int gameOver = 0;
-    while (gameOver == 0){
+    while (gameOver == 0 && !WindowShouldClose()){
+
+        if (game.linesCleared / 10 >= game.level){
+            game.level++;
+            dropDelay = pow((0.8 - ((game.level-1)*0.007)),(game.level-1));
+            // printf("%f %d", dropDelay, game.linesCleared);
+            // fflush(stdout);
+        }
 
         //addPiece(boardPosition, &piece);
         double currentTime = GetTime();
@@ -204,7 +140,7 @@ void playGame(){
             piece.y++;
         }
 
-        int changeGhostColourCheck = getInput(&piece, &ghost, boardPosition, &game);
+        int changeGhostColourCheck = getInput(&piece, &ghost, boardPosition, &game, &hold);
         
         ghost = piece;
 
@@ -230,19 +166,24 @@ void playGame(){
         if (changeGhostColourCheck == 1){
             piece.placed = 1;
             pieceNotMoved = 0;
+            HoldUsedYetThisGo = 0;
             //removePiece(boardPosition, &piece);
             changeGhost(boardPosition, &piece);
             newPiece(&piece, &game);
             if (collisionCheck(&piece, boardPosition)){
                 gameOver = 1;
+                ClearBackground(BLACK);
+                renderScreen(boardPosition, game, hold);
+                return;
             }
-            deleteLines(boardPosition);
-            renderScreen(boardPosition);
+            game.linesCleared += deleteLines(boardPosition);
+            
+            renderScreen(boardPosition, game, hold);
         }
         //getInput(&piece, boardPosition, boardPosition, &game);
         else{
             addPiece(boardPosition, &piece);
-            renderScreen(boardPosition);
+            renderScreen(boardPosition, game, hold);
             removePiece(boardPosition, &piece);
             removePiece(boardPosition, &ghost);
         }
@@ -252,24 +193,13 @@ void playGame(){
     }
 }
 
-void renderScreen(int boardPosition[23][12]){
+void renderScreen(int boardPosition[23][12], struct game_stats game_stats, struct current_piece hold){
 
     //Board Dimensions
     int screenWidth = GetScreenWidth();
     int screenHeight = GetScreenHeight();
     struct board board = getBoardDimensions(screenWidth, screenHeight);
-
-    // for (int i = 0; i < 23; i++){
-    //     for (int j = 0; j < 12; j++){
-    //         printf("%d ", boardPosition[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
     fflush(stdout);
-
-    // Tester Board Position
-    
 
     // Draw Screen
     BeginDrawing();
@@ -277,11 +207,20 @@ void renderScreen(int boardPosition[23][12]){
 
     drawBoard(board);
     drawPosition(boardPosition, board);
+    drawScoreboard(board, game_stats);
+
+    if (usedHoldYetEver == 1){
+        
+        DrawText("HOLD", board.x - (4 * getSquareSize()), board.y , 20, WHITE);
+        drawSmallPiece(hold, board, board.x - (4 * getSquareSize()), board.y + (getSquareSize()));
+    }
+
+    drawPiecesUpNext(board, board.x + board.w + (getSquareSize()), board.y+ (getSquareSize()), game_stats);
 
     EndDrawing();
 }
 
-int getInput(struct current_piece* piece, struct current_piece* ghost, int boardPosition[23][12], struct game_stats* game){
+int getInput(struct current_piece* piece, struct current_piece* ghost, int boardPosition[23][12], struct game_stats* game, struct current_piece* hold){
 
     struct current_piece copy;
 
@@ -293,6 +232,33 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
             pieceNotMoved = 0;
         }
         return 0;
+    }
+
+    if (IsKeyPressed(KEY_H)){
+        if (usedHoldYetEver == 0){
+            usedHoldYetEver = 1;
+            copyPiece(hold, piece);
+            while (hold->rotation != 0){
+                    turnRight(hold);
+            }
+            piece->placed = 1;
+            newPiece(piece, game);
+        }
+        else {
+            if (HoldUsedYetThisGo == 0){
+
+                
+                copyPiece(&copy, piece);
+                copyPiece(piece, hold);
+                copyPiece(hold, &copy);
+                piece->y = -1;
+                hold->y = -1;
+                while (hold->rotation != 0){
+                    turnRight(hold);
+                }
+                HoldUsedYetThisGo = 1;
+            }
+        }
     }
 
     if (IsKeyPressed(KEY_J)){
@@ -413,7 +379,8 @@ int deleteLines(int (*boardPostition)[12]){
         if (full == 1){
             clearUpTo = i;
             clearLines(boardPostition, clearUpTo);
-            return deleteLines(boardPostition);
+            
+            return 1 + deleteLines(boardPostition);
         }
     }
 

@@ -5,10 +5,7 @@
 #include "struct.h"
 #include "raylib.h"
 
-struct game_stats {
-    int piece_count;
-    int piece_order[7];
-};
+
 void copyMatrix(int dest[5][5], int src[5][5]);
 int collisionCheck(struct current_piece* piece, int boardPosition[23][12]);
 void changeX(struct current_piece* piece, int direction, int boardPosition[23][12]);
@@ -109,9 +106,11 @@ int o_move[4][2] = {
 };
 
 void shuffle(int arr[], int size) {
-    SetRandomSeed(GetTime());
+    if (GetTime() < 2){
+        srand(time(NULL));
+    }
     for (int i = size - 1; i > 0; i--) {
-        int j = GetRandomValue(0, 6); // Random index from 0 to i
+        int j = rand() % 7; // Random index from 0 to i
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
@@ -122,9 +121,26 @@ void shuffle(int arr[], int size) {
 void newPiece(struct current_piece* piece, struct game_stats* game){
 
     if (game->piece_count == 7){
-        game->piece_count = 0;
         shuffle(game->piece_order,7);
     }
+    if (game->piece_count == 14){
+        shuffle(game->piece_order2,7);
+        game->piece_count = 0;
+    }
+
+    // for (int i = 0; i < 7; i++){
+    //     printf("%d ", game->piece_order[i]);
+    // }
+    // for (int i = 0; i < 7; i++){
+    //     printf("%d ", game->piece_order2[i]);
+    // }
+    // printf("\n");
+    // fflush(stdout);
+
+
+
+
+
 
     if (piece->placed == 1){
         piece->x = 3;
@@ -133,8 +149,15 @@ void newPiece(struct current_piece* piece, struct game_stats* game){
         piece->rotation = 0;
         piece->type = 2;
 
-        int randomPiece = game->piece_order[game->piece_count];
-        game->piece_count++;
+        int randomPiece;
+        if (game->piece_count < 7){
+            randomPiece = game->piece_order[game->piece_count];
+            game->piece_count++;
+        }
+        else {
+            randomPiece = game->piece_order2[game->piece_count - 7];
+            game->piece_count++;
+        }
         switch (randomPiece){
             case 0:
             copyMatrix(piece->grid, I_piece);

@@ -250,12 +250,16 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
         return 0;
     }
     if (IsKeyPressed(KEY_K)){
+        
         copyPiece(&copy, piece);
         turnRight(&copy);
         if (collisionCheck(&copy, boardPosition) == 0){
             turnRight(piece);
             pieceNotMoved = 0;
+            return 0;
         }
+
+
         return 0;
     }
     if (IsKeyPressed(KEY_SPACE)){

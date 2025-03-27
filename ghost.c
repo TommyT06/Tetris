@@ -19,22 +19,9 @@ int lookUp(int boardPosition[23][12], struct current_piece* piece, int y, int st
 
     piece->y = temp_y;
     return 1;
-
 }
 
-
-
 void getGhost(struct current_piece* piece, int boardPosition[23][12]){
-
-    // for (int i = 0; i < 23; i++){
-    //     for (int j = 0; j < 12; j++){
-    //         printf("%d ", boardPosition[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // fflush(stdout);
-
 
     int starter_y = piece->y;
 
@@ -46,7 +33,6 @@ void getGhost(struct current_piece* piece, int boardPosition[23][12]){
             break;
         }
     }
-
     for (int i = 0; i < 5; i++){
         for (int j = 0; j < 5; j++){
             if (piece->grid[i][j] != 0){
@@ -54,5 +40,4 @@ void getGhost(struct current_piece* piece, int boardPosition[23][12]){
             }
         }
     }
-
 }

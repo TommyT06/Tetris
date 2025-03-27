@@ -40,8 +40,6 @@ int main(){
 
     // start window
     InitWindow(START_SCREEN_WIDTH, START_SCREEN_HEIGHT,"Tetris");
-    // SetWindowMinSize(100,100);
-    // SetWindowMaxSize(1000,1000);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetWindowState(FLAG_WINDOW_MAXIMIZED);
     SetTargetFPS(60);
@@ -129,11 +127,9 @@ void playGame(){
         if (game.linesCleared / 10 >= game.level){
             game.level++;
             dropDelay = pow((0.8 - ((game.level-1)*0.007)),(game.level-1));
-            // printf("%f %d", dropDelay, game.linesCleared);
-            // fflush(stdout);
+
         }
 
-        //addPiece(boardPosition, &piece);
         double currentTime = GetTime();
         if ((currentTime - lastDropTime >= dropDelay) && piece.y < ghost.y){
             lastDropTime = currentTime;
@@ -167,7 +163,6 @@ void playGame(){
             piece.placed = 1;
             pieceNotMoved = 0;
             HoldUsedYetThisGo = 0;
-            //removePiece(boardPosition, &piece);
             changeGhost(boardPosition, &piece);
             newPiece(&piece, &game);
             if (collisionCheck(&piece, boardPosition)){
@@ -180,16 +175,12 @@ void playGame(){
             
             renderScreen(boardPosition, game, hold);
         }
-        //getInput(&piece, boardPosition, boardPosition, &game);
         else{
             addPiece(boardPosition, &piece);
             renderScreen(boardPosition, game, hold);
             removePiece(boardPosition, &piece);
             removePiece(boardPosition, &ghost);
         }
-
-        // check for full lines
-
     }
 }
 
@@ -224,16 +215,7 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
 
     struct current_piece copy;
 
-    if (IsKeyPressed(KEY_K)){
-        copyPiece(&copy, piece);
-        turnRight(&copy);
-        if (collisionCheck(&copy, boardPosition) == 0){
-            turnRight(piece);
-            pieceNotMoved = 0;
-        }
-        return 0;
-    }
-
+    // Hold
     if (IsKeyPressed(KEY_H)){
         if (usedHoldYetEver == 0){
             usedHoldYetEver = 1;
@@ -245,9 +227,7 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
             newPiece(piece, game);
         }
         else {
-            if (HoldUsedYetThisGo == 0){
-
-                
+            if (HoldUsedYetThisGo == 0){    
                 copyPiece(&copy, piece);
                 copyPiece(piece, hold);
                 copyPiece(hold, &copy);
@@ -260,7 +240,6 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
             }
         }
     }
-
     if (IsKeyPressed(KEY_J)){
         copyPiece(&copy, piece);
         turnLeft(&copy);
@@ -270,7 +249,15 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
         }
         return 0;
     }
-
+    if (IsKeyPressed(KEY_K)){
+        copyPiece(&copy, piece);
+        turnRight(&copy);
+        if (collisionCheck(&copy, boardPosition) == 0){
+            turnRight(piece);
+            pieceNotMoved = 0;
+        }
+        return 0;
+    }
     if (IsKeyPressed(KEY_SPACE)){
         return 1;
     }
@@ -294,14 +281,13 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
         }
         return 0;
     }
-
     if (IsKeyReleased(KEY_D)){
         heldInputStartTime = GetTime();
         return 0;
     }
 
-    // Right
 
+    // Right
     if (IsKeyPressed(KEY_A)){
         int temp_x = piece->x;
         heldInputStartTime = GetTime();
@@ -323,7 +309,6 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
         heldInputStartTime = GetTime();
         return 0;
     }
-
     return 0;
 }
 
@@ -360,7 +345,6 @@ void changeGhost(int (*boardPosition)[12], struct current_piece* piece){
             }
         }
     }
-
 }
 
 int deleteLines(int (*boardPostition)[12]){
@@ -378,12 +362,10 @@ int deleteLines(int (*boardPostition)[12]){
         }
         if (full == 1){
             clearUpTo = i;
-            clearLines(boardPostition, clearUpTo);
-            
+            clearLines(boardPostition, clearUpTo);  
             return 1 + deleteLines(boardPostition);
         }
     }
-
     return 0;
 }
 

@@ -128,20 +128,6 @@ void newPiece(struct current_piece* piece, struct game_stats* game){
         game->piece_count = 0;
     }
 
-    // for (int i = 0; i < 7; i++){
-    //     printf("%d ", game->piece_order[i]);
-    // }
-    // for (int i = 0; i < 7; i++){
-    //     printf("%d ", game->piece_order2[i]);
-    // }
-    // printf("\n");
-    // fflush(stdout);
-
-
-
-
-
-
     if (piece->placed == 1){
         piece->x = 3;
         piece->y = -1;
@@ -220,7 +206,6 @@ int collisionCheck(struct current_piece* piece, int boardPosition[23][12]){
             }
         }
     }
-
     return 0;
 }
 
@@ -254,8 +239,6 @@ void turnRight(struct current_piece* piece){
 
 
     piece->rotation = (piece->rotation + 1) % 4;
-    // printf("%d\n", piece->rotation);
-    // fflush(stdout);
 
     if (piece->type == 0){
         piece->x = piece->x + i_move[piece->rotation][0];
@@ -302,8 +285,6 @@ void turnLeft(struct current_piece* piece) {
     if (piece->rotation == -1){
         piece->rotation = 3;
     }
-    // printf("%d\n", piece->rotation);
-    // fflush(stdout);
 
     if (piece->type == 0){
         piece->x = piece->x + i_move[piece->rotation][0];
@@ -317,12 +298,10 @@ void turnLeft(struct current_piece* piece) {
 
 
 void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece){
-
     copyMatrix(dest_piece->grid, src_piece->grid);
     dest_piece->rotation = src_piece->rotation;
     dest_piece->x = src_piece->x;
     dest_piece->y = src_piece->y;
     dest_piece->placed = src_piece->placed;
     dest_piece->type = src_piece->type;
-
 }

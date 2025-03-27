@@ -22,7 +22,6 @@ void drawBoard(struct board board){
     struct Rectangle board_outline = {board.x-2, board.y-2, board.w+4, board.h+4};
 
     DrawRectangleLinesEx(board_outline, 2, WHITE);
-
 }
 
 struct board getBoardDimensions(int screenWidth, int screenHeight){
@@ -93,12 +92,6 @@ struct Color getSquareColor(int block){
 
 void drawPosition(int boardPosition[23][12], struct board board){
     
-    // for (int i =0; i < 21; i++){
-    //     for (int j = 0; j < 12; j++){
-    //         printf("%d ", boardPosition[i][j]);
-    //     }
-    //     printf("\n");
-    // }
     fflush(stdout);
 
     struct Square {
@@ -185,7 +178,4 @@ void drawPiecesUpNext(struct board board, int x, int y, struct game_stats game){
         piece.placed = 1;
         drawSmallPiece(piece, board, x, y + ((getSquareSize() * 3)*i));
     }
-
 }
-
-

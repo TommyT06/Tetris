@@ -12,4 +12,6 @@ void turnRight(struct current_piece* piece);
 void turnLeft(struct current_piece* piece);
 void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece);
 void shuffle(int arr[], int size);
+void turningLeft(struct current_piece* piece, int boardPosition[23][12]);
+void turningRight(struct current_piece* piece, int boardPosition[23][12]);
 #endif

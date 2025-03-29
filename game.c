@@ -14,7 +14,7 @@
 #define START_SCREEN_HEIGHT 1000
 
 void renderScreen(int boardPosition[23][12], struct game_stats, struct current_piece);
-void playGame(void);
+void playGame(int start_level);
 void addPiece(int (*boardPosition)[12], struct current_piece*);
 void removePiece(int (*boardPosition)[12], struct current_piece*);
 int getInput(struct current_piece*, struct current_piece*,  int boardPosition[23][12], struct game_stats*, struct current_piece*);
@@ -24,6 +24,7 @@ void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece
 void changeGhost(int (*boardPosition)[12], struct current_piece* piece);
 void clearLines(int (*boardPosition)[12], int);
 int deleteLines(int (*boardPosition)[12]);
+int titleScreen(void);
 
 
 
@@ -46,26 +47,58 @@ int main(){
 
     int Quit_Game = 0;
 
-    playGame();
+    // playGame();
     // Game loop
     while (Quit_Game == 0 && !WindowShouldClose()){
-        int playAgain = 0;
-        printf("Play Again: ");
-        scanf("%d", &playAgain);
-        if (playAgain == 0){
-            Quit_Game = 1;
+
+        int start_stat = titleScreen();
+
+        if (start_stat == 0){
+            Quit_Game == 0;
         }
-        if (playAgain == 1){
-            while (GetKeyPressed() != 0);
-            playGame();
+        else {
+            playGame(start_stat);
         }
+
     }
     CloseWindow();
 
     return 0;
 }
 
-void playGame(){
+int titleScreen(){
+
+    while (!WindowShouldClose()){
+        BeginDrawing();  
+
+        ClearBackground(BLACK);
+
+        int fontsize = 100;
+        const char* title = "TETRIS";
+        const char* play = "Play Game";
+        int screenW = GetScreenWidth();
+        int screenH = GetScreenHeight();
+        
+        DrawText("TETRIS", (GetScreenWidth() - MeasureText(title, fontsize))/2, GetScreenHeight()/4, fontsize, WHITE);
+
+        DrawRectangle((screenW/2) - 200, screenH/2, 400, 100, (Color){100,100,100,255});
+        DrawText(play, (screenW/2) - 200+70,screenH/2+25, 50, BLACK);
+        
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            if ((GetMouseX() > (screenW/2)-200) && (GetMouseX() <= (screenW/2)+200)){
+                if ((GetMouseY() > screenH/2+25) && (GetMouseY()<= (screenH/2+25)+100)){
+                    playGame(1);
+                }
+            }
+        }
+
+        EndDrawing();
+        
+    }
+    return 0;
+}
+
+void playGame(int start_level){
 
 
     heldInputStartTime = 0;
@@ -113,8 +146,9 @@ void playGame(){
     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
     };
     
+    dropDelay = pow((0.8 - ((start_level-1)*0.007)),(start_level-1));
 
-    struct game_stats game = {0, {0,1,2,3,4,5,6}, {0,1,2,3,4,5,6}, 0, 1};
+    struct game_stats game = {0, {0,1,2,3,4,5,6}, {0,1,2,3,4,5,6}, 0, start_level};
 
     shuffle(game.piece_order, 7);
     shuffle(game.piece_order2, 7);
@@ -233,6 +267,7 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
                 copyPiece(hold, &copy);
                 piece->y = -1;
                 hold->y = -1;
+                hold->x = 3;
                 while (hold->rotation != 0){
                     turnRight(hold);
                 }
@@ -240,26 +275,16 @@ int getInput(struct current_piece* piece, struct current_piece* ghost, int board
             }
         }
     }
+
+    // turn left
     if (IsKeyPressed(KEY_J)){
-        copyPiece(&copy, piece);
-        turnLeft(&copy);
-        if (collisionCheck(&copy, boardPosition) == 0){
-            turnLeft(piece);
-            pieceNotMoved = 0;
-        }
+        turningLeft(piece, boardPosition);
         return 0;
     }
+
+    // turn right
     if (IsKeyPressed(KEY_K)){
-        
-        copyPiece(&copy, piece);
-        turnRight(&copy);
-        if (collisionCheck(&copy, boardPosition) == 0){
-            turnRight(piece);
-            pieceNotMoved = 0;
-            return 0;
-        }
-
-
+        turningRight(piece, boardPosition);
         return 0;
     }
     if (IsKeyPressed(KEY_SPACE)){

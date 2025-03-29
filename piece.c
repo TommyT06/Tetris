@@ -12,6 +12,8 @@ void shuffle(int arr[], int size);
 void turnLeft(struct current_piece* piece);
 void turnRight(struct current_piece* piece);
 void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece);
+void turningLeft(struct current_piece* piece, int boardPosition[23][12]);
+void turningRight(struct current_piece* piece, int boardPosition[23][12]);
 
 
 int I_piece[5][5] = {
@@ -68,27 +70,6 @@ int Z_piece[5][5] = {
     {0, 0, 6, 6, 0},
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0}
-};
-
-int gen_shift[4][10] = {
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,1,0,1,-1,0,2,1,2},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,-1,0,-1,-1,0,2,-1,2},
-};
-
-int i_shift[4][10] = {
-    {0,0,-1,0,2,0,-1,0,2,0},
-    {1,0,0,0,0,0,0,1,0,-2},
-    {1,-1,1,1,-2,1,1,0,-1,0},
-    {0,-1,0,1,0,1,0,-1,0,2}
-};
-
-int o_shift[4][2] ={
-    {0,0},
-    {0,1},
-    {1,1},
-    {1,0}
 };
 
 int i_move[4][2] = {
@@ -304,4 +285,124 @@ void copyPiece(struct current_piece* dest_piece, struct current_piece* src_piece
     dest_piece->y = src_piece->y;
     dest_piece->placed = src_piece->placed;
     dest_piece->type = src_piece->type;
+}
+
+int general_shifts_left[4][10] = {
+    {0,0,1,0,1,-1,0,2,1,2},
+    {0,0,1,0,1,1,0,-2,1,-2},
+    {0,0,-1,0,-1,-1,0,2,-1,2},
+    {0,0,-1,0,-1,1,0,-2,-1,-2}
+};
+
+int l_shifts_left[4][10] = {
+    {0,0,-1,0,2,0,-1,-2,2,1},
+    {0,0,2,0,-1,0,2,-1,-1,2},
+    {0,0,1,0,-2,0,1,2,-2,-1},
+    {0,0,-2,0,1,0,-2,1,1,-2}
+};
+
+int general_shifts_right[4][10] = {
+    {0,0,-1,0,-1,-1,0,2,-1,2},
+    {0,0,1,0,1,1,0,-2,1,-2},
+    {0,0,1,0,1,-1,0,2,1,2},
+    {0,0,-1,0,-1,1,0,-2,-1,-2}
+};
+
+int l_shifts_right[4][10] = {
+    {0,0,-2,0,1,0,-2,1,1,-2},
+    {0,0,-1,0,2,0,-1,-2,2,1},
+    {0,0,2,0,-1,0,2,-1,-1,2},
+    {0,0,1,0,-2,0,1,2,-2,1}
+};
+
+void turningLeft(struct current_piece* piece, int boardPosition[23][12]){
+
+    struct current_piece copy;
+    int x = 0;
+
+    if (piece->type == 1){
+        turnLeft(piece);
+        return;
+    }
+
+    if (piece->type == 2){
+        while (x < 5){
+
+            copyPiece(&copy, piece);
+
+            copy.x = copy.x + general_shifts_left[copy.rotation][x*2];
+            copy.y = copy.y + general_shifts_left[copy.rotation][(x*2)+1];
+
+            turnLeft(&copy);
+
+            if (!(collisionCheck(&copy, boardPosition))){
+                copyPiece(piece, &copy);
+                return;
+            }
+            x++;
+        }
+    }
+    else{
+        while (x < 5){
+
+            copyPiece(&copy, piece);
+
+            copy.x = copy.x + l_shifts_left[copy.rotation][x*2];
+            copy.y = copy.y + l_shifts_left[copy.rotation][(x*2)+1];
+
+            turnLeft(&copy);
+
+            if (!(collisionCheck(&copy, boardPosition))){
+                copyPiece(piece, &copy);
+                return;
+            }
+            x++;
+        }
+    }
+}
+
+void turningRight(struct current_piece* piece, int boardPosition[23][12]){
+
+    struct current_piece copy;
+    int x = 0;
+
+    if (piece->type == 1){
+        turnRight(piece);
+        return;
+    }
+
+    if (piece->type == 2){
+        while (x < 5){
+
+            copyPiece(&copy, piece);
+
+            copy.x = copy.x + general_shifts_right[copy.rotation][x*2];
+            copy.y = copy.y + general_shifts_right[copy.rotation][(x*2)+1];
+
+            turnRight(&copy);
+
+            if (!(collisionCheck(&copy, boardPosition))){
+                copyPiece(piece, &copy);
+                return;
+            }
+            x++;
+        }
+    }
+    else{
+        while (x < 5){
+
+            copyPiece(&copy, piece);
+
+            copy.x = copy.x + l_shifts_right[copy.rotation][x*2];
+            copy.y = copy.y + l_shifts_right[copy.rotation][(x*2)+1];
+
+            turnRight(&copy);
+
+            if (!(collisionCheck(&copy, boardPosition))){
+                copyPiece(piece, &copy);
+                return;
+            }
+            x++;
+        }
+    }
 }
